@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="bucket_textview_left_style">
+        <item name="android:textSize">16.0sp</item>
+        <item name="android:textColor">#ff676767</item>
+        <item name="android:paddingLeft">10.0dip</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5.0dip</item>
+    </style>
+
+    <style name="bucket_textview_right_style" parent="@style/bucket_textview_left_style">
+        <item name="android:textSize">16.0sp</item>
+        <item name="android:textColor">#ff676767</item>
+        <item name="android:paddingRight">10.0dip</item>
+        <item name="android:layout_alignParentRight">true</item>
+    </style>
+
+</resources>

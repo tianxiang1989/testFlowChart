@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/rl_text"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffffff"
+    android:paddingBottom="10.0dip"
+    android:paddingTop="30.0dip" >
+
+    <TextView
+        android:id="@id/tv_title"
+        style="@style/bucket_textview_left_style"
+        android:layout_centerHorizontal="true"
+        android:text="27/03月" />
+
+    <TextView
+        android:id="@id/tv_remainingbudget"
+        style="@style/bucket_textview_left_style"
+        android:layout_alignParentBottom="true"
+        android:text="剩余预算" />
+
+    <TextView
+        android:id="@id/tv_remainingbudget_money"
+        style="@style/bucket_textview_right_style"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="0.00" />
+
+    <TextView
+        android:id="@id/tv_payed"
+        style="@style/bucket_textview_left_style"
+        android:layout_above="@id/tv_remainingbudget"
+        android:text="已支出" />
+
+    <TextView
+        android:id="@id/tv_payed_money"
+        style="@style/bucket_textview_right_style"
+        android:layout_above="@id/tv_remainingbudget_money"
+        android:text="0.00" />
+
+    <TextView
+        android:id="@id/tv_budget"
+        style="@style/bucket_textview_left_style"
+        android:layout_above="@id/tv_payed"
+        android:text="总预算"
+        android:textSize="20.0sp" />
+
+    <TextView
+        android:id="@id/tv_setting_state"
+        style="@style/bucket_textview_right_style"
+        android:layout_above="@id/tv_payed_money"
+        android:background="@null"
+        android:clickable="true"
+        android:drawableLeft="@drawable/setting_yusuan"
+        android:drawablePadding="5.0dip"
+        android:gravity="center_vertical"
+        android:text="未设置"
+        android:textSize="20.0sp" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1.0dip"
+        android:layout_below="@id/tv_budget"
+        android:background="#ffc5c9ce" />
+
+    <RelativeLayout
+        android:layout_width="270.0dip"
+        android:layout_height="300.0dip"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/tv_title"
+        android:layout_marginRight="12.0dip" >
+
+        <com.talicai.timiclient.ui.view.WaterImage
+            android:id="@id/water"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentBottom="true" />
+
+        <ImageView
+            android:id="@id/image_2"
+            android:layout_width="200.0dip"
+            android:layout_height="300.0dip"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bottle" />
+    </RelativeLayout>
+
+</RelativeLayout>
