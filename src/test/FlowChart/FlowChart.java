@@ -136,8 +136,6 @@ public class FlowChart extends View {
 	/**复位动画*/
 	public void resetAinm() {
 		offset = 0; // 偏移归0
-		DrawThread dr = new DrawThread();
-		dr.start();
 	}
 
 	@Override
