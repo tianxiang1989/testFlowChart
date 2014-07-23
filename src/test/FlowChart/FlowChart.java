@@ -51,7 +51,7 @@ public class FlowChart extends View {
 	/**只有setValues传值后才开始ondraw*/
 	private boolean runDraw = false;
 	/**背景图的实际宽度的像素值*/
-	private int widthBackgroud ;
+	private int widthBackgroud;
 	/**背景图的实际高度的像素值*/
 	private int heightBackgroud;
 
@@ -61,9 +61,9 @@ public class FlowChart extends View {
 	 * @param waterHeight 实际值
 	 */
 	public void setValues(float heightMax, float waterHeight) {
-		if (heightMax > waterHeight && waterHeight>= 0) {
-			this.heightMax=heightMax;
-			this.waterHeight=waterHeight;
+		if (heightMax >= waterHeight && waterHeight >= 0) {
+			this.heightMax = heightMax;
+			this.waterHeight = waterHeight;
 			init();
 			runDraw = true;
 			invalidate();
@@ -93,6 +93,10 @@ public class FlowChart extends View {
 		super(context, attrs, defStyle);
 	}
 
+	public float getHeightMax() {
+		return this.heightMax;
+	}
+
 	/**
 	 * 数据初始化
 	 */
@@ -120,12 +124,10 @@ public class FlowChart extends View {
 		this.widthBackgroud = changeDp(200);
 		this.heightBackgroud = changeDp(300);
 		// 计算实际绘制的矩形的高度
-		this.drawHeight = heightBackgroud
-				* this.waterHeight / this.heightMax;
-		float h1=heightBackgroud-drawHeight/ratioBitmap;
+		this.drawHeight = heightBackgroud * this.waterHeight / this.heightMax;
+		float h1 = heightBackgroud - drawHeight / ratioBitmap;
 		// 设置实际绘制的矩形位置
-		this.drawRect = new Rect(0, (int) h1, widthBackgroud,
-				heightBackgroud);
+		this.drawRect = new Rect(0, (int) h1, widthBackgroud, heightBackgroud);
 		// 画笔初始化
 		this.paint1 = new Paint();
 		this.paint1.setAntiAlias(true);
@@ -159,42 +161,48 @@ public class FlowChart extends View {
 	}
 
 	/**返回threadRun状态:false执行完成;true为正在执行*/
-	public boolean getThreadRun(){
+	public boolean getThreadRun() {
 		return this.threadRun;
 	}
-	
+
 	@Override
 	protected void onDraw(Canvas paramCanvas) {
 		if (runDraw) {
 			paramCanvas.drawBitmap(this.bitmapArray[drawWhich()],
 					this.sourceRect, this.drawRect, null);
-			int i4 = (int) (this.heightBackgroud-drawHeight); //背景高度减去实际绘制的矩形的高度
-			int width4 = changeDp(220);
-			paint2.setStrokeWidth(2.5f); // 线宽
+			this.paint2.setColor(Color.parseColor("#C5C9CE"));
+			int width4 = changeDp(220);// 220dp 为自己估计的值
+			paint2.setStrokeWidth(2f); // 线宽
+			int heightTotal = changeDp(300);
+			for (int i = 0; i <= 20; i++) {// 画刻度横线
+				paramCanvas.drawLine(width4, heightTotal / 20F * i, changeDp(5)
+						+ width4, heightTotal / 20F * i, paint2);
+			}
+			paramCanvas.drawLine(width4, 0, width4, heightTotal, paint2); // 画刻度竖线
+			int i4 = (int) (this.heightBackgroud - drawHeight); // 背景高度减去实际绘制的矩形的高度
+			paint2.setStrokeWidth(3f); // 线宽
 			paint2.setColor(Color.parseColor("#000000")); // 黑色
 			// 绘制当前数值的横线
 			paramCanvas.drawLine(width4, i4, changeDp(10) + width4, i4,
 					this.paint2);
 			Object[] arrayOfObject = new Object[1];
 			arrayOfObject[0] = Float.valueOf(100F * waterHeight / heightMax);
-			paramCanvas.drawText(String.format("%.2f", arrayOfObject) + "%",
-					changeDp(12) + width4, i4, paint1);// 百分比的数值
-			this.paint2.setColor(Color.parseColor("#C5C9CE"));
-			paint2.setStrokeWidth(2.0f); // 线宽
-			int heightTotal = changeDp(300);
-			for (int i = 0; i <= 20; i++) {//画刻度横线
-				paramCanvas.drawLine(width4, heightTotal / 20F * i, changeDp(5)
-						+ width4, heightTotal / 20F * i, paint2);
+			if (waterHeight / heightMax < 1) {
+				paramCanvas.drawText(
+						String.format("%.2f", arrayOfObject) + "%",
+						changeDp(12) + width4, i4, paint1);// 百分比的数值
+			} else {
+				paramCanvas.drawText(
+						String.format("%.2f", arrayOfObject) + "%",
+						changeDp(12) + width4, i4+changeDp(10), paint1);// 100%
 			}
 
-			paramCanvas.drawLine(width4, 0, width4, heightTotal, paint2); // 画刻度竖线
-			
 		}
 	}
 
 	/**最大值的TextView*/
 	TextView maxTextView;
-	
+
 	/**
 	 * 判断当前的数值调用哪一张water图[颜色不同]
 	 * @return 调用的water图序号

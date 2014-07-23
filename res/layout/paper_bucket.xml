@@ -14,8 +14,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
         android:text="流量图" />
-
     <RelativeLayout
+
         android:layout_width="270.0dp"
         android:layout_height="300.0dp"
         android:layout_alignParentRight="true"
@@ -52,7 +52,7 @@
             android:layout_alignLeft="@id/max_val"
             android:background="@drawable/setbar_bg"
             android:clickable="true"
-            android:text="开启动画"
+            android:text="播放动画"
             android:textSize="22.0sp" />
 
         <TextView

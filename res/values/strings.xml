@@ -2,5 +2,7 @@
 
     <string name="app_name">testFlowChart</string>
     <string name="hello">hello~</string>
-
+    <string name="input_hint">请输入内容</string>
+    <string name="input_confirm">确认</string>
+    <string name="input_cancel">取消</string>
 </resources>
