@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.testflowchart.R;
 
@@ -20,9 +21,9 @@ import com.example.testflowchart.R;
  */
 public class FlowChart extends View {
 	/**定义的最大总高度*/
-	private final int HEIGHTMAX = 600;
+	private float heightMax;
 	/**需要绘制的值 [和height1的值成比例]*/
-	private int waterHeight;
+	private float waterHeight;
 	/**取water图片的矩形范围*/
 	private Rect sourceRect;
 	/**画water图片的矩形范围*/
@@ -42,11 +43,34 @@ public class FlowChart extends View {
 	/**实际绘制的矩形的高度*/
 	private float drawHeight;
 	/**控制同一时间只执行一次:false执行完成;true为正在执行*/
-	public boolean runNow = false;
+	private boolean threadRun = false;
 	/**每一次显示的water图像宽度*/
-	public float showRadioWaterWidth = 3F / 4;
+	private float showRadioWaterWidth = 3F / 4;
 	/**thread中显示的偏移量*/
-	public int offset = 0;
+	private int offset = 0;
+	/**只有setValues传值后才开始ondraw*/
+	private boolean runDraw = false;
+	/**背景图的实际宽度的像素值*/
+	private int widthBackgroud ;
+	/**背景图的实际高度的像素值*/
+	private int heightBackgroud;
+
+	/**
+	 * 设置最大值和实际值的方法 [设置完成后才会进行init和ondraw等一系列方法]
+	 * @param heightMax 最大值
+	 * @param waterHeight 实际值
+	 */
+	public void setValues(float heightMax, float waterHeight) {
+		if (heightMax > waterHeight && waterHeight>= 0) {
+			this.heightMax=heightMax;
+			this.waterHeight=waterHeight;
+			init();
+			runDraw = true;
+			invalidate();
+		} else {
+			return;
+		}
+	}
 
 	/**
 	 * 构造方法
@@ -67,15 +91,12 @@ public class FlowChart extends View {
 	 */
 	public FlowChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		this.waterHeight = 283;
-		init(context);
 	}
 
 	/**
 	 * 数据初始化
-	 * @param paramContext
 	 */
-	public void init(Context paramContext) {
+	private void init() {
 		// 加载5张water图
 		Bitmap[] arrayOfBitmap = new Bitmap[5];
 		arrayOfBitmap[0] = BitmapFactory.decodeResource(getResources(),
@@ -93,16 +114,17 @@ public class FlowChart extends View {
 		this.bitmapWidth = this.bitmapArray[0].getWidth();
 		this.bitmapHeight = this.bitmapArray[0].getHeight();
 		// 设置初始读取water图的位置
-		this.sourceRect = new Rect((int) (bitmapWidth * showRadioWaterWidth), 0,
-				this.bitmapWidth, bitmapHeight);
-		// 背景图的宽高转为pix
-		int widthBackgroud = changeDp(200);
-		int heightBackgroud = changeDp(300);
+		this.sourceRect = new Rect((int) (bitmapWidth * showRadioWaterWidth),
+				0, this.bitmapWidth, bitmapHeight);
+		// 背景图的实际宽高转为pix
+		this.widthBackgroud = changeDp(200);
+		this.heightBackgroud = changeDp(300);
 		// 计算实际绘制的矩形的高度
-		this.drawHeight = (ratioBitmap * heightBackgroud
-				* (this.HEIGHTMAX - this.waterHeight) / this.HEIGHTMAX);
+		this.drawHeight = heightBackgroud
+				* this.waterHeight / this.heightMax;
+		float h1=heightBackgroud-drawHeight/ratioBitmap;
 		// 设置实际绘制的矩形位置
-		this.drawRect = new Rect(0, (int) drawHeight, widthBackgroud,
+		this.drawRect = new Rect(0, (int) h1, widthBackgroud,
 				heightBackgroud);
 		// 画笔初始化
 		this.paint1 = new Paint();
@@ -111,8 +133,6 @@ public class FlowChart extends View {
 		this.paint2 = new Paint();
 		this.paint2.setAntiAlias(true);
 		this.paint2.setStyle(Paint.Style.FILL);
-		paint2.setStrokeWidth(5f); // 线宽
-		paint2.setColor(Color.parseColor("#000000")); // 黑色
 	}
 
 	/**
@@ -138,43 +158,55 @@ public class FlowChart extends View {
 		offset = 0; // 偏移归0
 	}
 
+	/**返回threadRun状态:false执行完成;true为正在执行*/
+	public boolean getThreadRun(){
+		return this.threadRun;
+	}
+	
 	@Override
 	protected void onDraw(Canvas paramCanvas) {
-		paramCanvas.drawBitmap(this.bitmapArray[drawWhich()], this.sourceRect,
-				this.drawRect, null);
-		int i4 = (int) (drawHeight / ratioBitmap);
-		int width4 = changeDp(220);
-		// 绘制当前数值的横线
-		paramCanvas
-				.drawLine(width4, i4, changeDp(10) + width4, i4, this.paint2);
-		Object[] arrayOfObject = new Object[1];
-		arrayOfObject[0] = Float.valueOf(100F * waterHeight / HEIGHTMAX);
-		paramCanvas.drawText(String.format("%.2f", arrayOfObject) + "%",
-				changeDp(12) + width4, i4, paint1);// 数值
-		this.paint2.setColor(Color.parseColor("#C5C9CE"));
-		paint2.setStrokeWidth(2.0f); // 线宽
-		int heightTotal = changeDp(300);
-		for (int i = 0; i <= 20; i++) {
-			paramCanvas.drawLine(width4, heightTotal / 20F * i, changeDp(5)
-					+ width4, heightTotal / 20F * i, paint2);
+		if (runDraw) {
+			paramCanvas.drawBitmap(this.bitmapArray[drawWhich()],
+					this.sourceRect, this.drawRect, null);
+			int i4 = (int) (this.heightBackgroud-drawHeight); //背景高度减去实际绘制的矩形的高度
+			int width4 = changeDp(220);
+			paint2.setStrokeWidth(2.5f); // 线宽
+			paint2.setColor(Color.parseColor("#000000")); // 黑色
+			// 绘制当前数值的横线
+			paramCanvas.drawLine(width4, i4, changeDp(10) + width4, i4,
+					this.paint2);
+			Object[] arrayOfObject = new Object[1];
+			arrayOfObject[0] = Float.valueOf(100F * waterHeight / heightMax);
+			paramCanvas.drawText(String.format("%.2f", arrayOfObject) + "%",
+					changeDp(12) + width4, i4, paint1);// 百分比的数值
+			this.paint2.setColor(Color.parseColor("#C5C9CE"));
+			paint2.setStrokeWidth(2.0f); // 线宽
+			int heightTotal = changeDp(300);
+			for (int i = 0; i <= 20; i++) {//画刻度横线
+				paramCanvas.drawLine(width4, heightTotal / 20F * i, changeDp(5)
+						+ width4, heightTotal / 20F * i, paint2);
+			}
+
+			paramCanvas.drawLine(width4, 0, width4, heightTotal, paint2); // 画刻度竖线
+			
 		}
-
-		paramCanvas.drawLine(width4, 0, width4, heightTotal, paint2); // 竖线
-
 	}
 
+	/**最大值的TextView*/
+	TextView maxTextView;
+	
 	/**
 	 * 判断当前的数值调用哪一张water图[颜色不同]
 	 * @return 调用的water图序号
 	 */
 	private int drawWhich() {
-		if (this.waterHeight > 4.5D * this.HEIGHTMAX / 5)
+		if (this.waterHeight > 4.5D * this.heightMax / 5)
 			return 4;
-		if (this.waterHeight > 4D * this.HEIGHTMAX / 5)
+		if (this.waterHeight > 4D * this.heightMax / 5)
 			return 3;
-		if (this.waterHeight > 3D * this.HEIGHTMAX / 5)
+		if (this.waterHeight > 3D * this.heightMax / 5)
 			return 2;
-		if (this.waterHeight > 2D * this.HEIGHTMAX / 5)
+		if (this.waterHeight > 2D * this.heightMax / 5)
 			return 1;
 		return 0;
 	}
@@ -183,15 +215,15 @@ public class FlowChart extends View {
 	public class DrawThread extends Thread {
 		@Override
 		public void run() {
-			runNow = true; // 标识当前正在运行
+			threadRun = true; // 标识当前正在运行
 			while (true) {
 				if (bitmapWidth * showRadioWaterWidth - offset > 0) {
 					offset = offset + 3;// 宽度每次移动3像素
-					sourceRect.set((int) (bitmapWidth * showRadioWaterWidth) - offset, 0,
-							bitmapWidth - offset, bitmapHeight);
+					sourceRect.set((int) (bitmapWidth * showRadioWaterWidth)
+							- offset, 0, bitmapWidth - offset, bitmapHeight);
 					postInvalidate();// 刷新
 				} else {
-					runNow = false;// 标识线程执行完毕
+					threadRun = false;// 标识线程执行完毕
 					postInvalidate();
 					break;
 				}
