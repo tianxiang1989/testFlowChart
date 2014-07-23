@@ -170,7 +170,7 @@ public class FlowChart extends View {
 		if (runDraw) {
 			paramCanvas.drawBitmap(this.bitmapArray[drawWhich()],
 					this.sourceRect, this.drawRect, null);
-			this.paint2.setColor(Color.parseColor("#C5C9CE"));
+			this.paint2.setColor(Color.parseColor("#C5C9CE"));//灰色
 			int width4 = changeDp(220);// 220dp 为自己估计的值
 			paint2.setStrokeWidth(2f); // 线宽
 			int heightTotal = changeDp(300);
